@@ -8,3 +8,68 @@
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 </div>
+
+<div>
+    <h3 class="display-4">SQL Write</h3>
+    <h4>Success: @Model.WriteToRW.success.ToString()</h4>
+    <h4>Server: @Model.WriteToRW.serverName</h4>
+    @if (!Model.WriteToRW.success)
+    {
+        <h4>Error: @Model.WriteToRW.errorMessage</h4>
+    }
+</div>
+<br />
+
+<div>
+    <h3 class="display-4">SQL Read</h3>
+    <h4>Success: @Model.ReadFromRW.success.ToString()</h4>
+    <h4>Server: @Model.ReadFromRW.serverName</h4>
+    @if (!Model.ReadFromRW.success)
+    {
+        <h4>Error: @Model.ReadFromRW.errorMessage</h4>
+    }
+</div>
+<br />
+
+<div>
+    <h3 class="display-4">SQL Read From Secondary</h3>
+    <h4>Success: @Model.ReadFromRO.success.ToString()</h4>
+    <h4>Server: @Model.ReadFromRO.serverName</h4>
+    @if (!Model.ReadFromRO.success)
+    {
+        <h4>Error: @Model.ReadFromRO.errorMessage</h4>
+    }
+</div>
+<br />
+
+
+<div>
+    <h3 class="display-4">SQL Read Intent</h3>
+    <h4>Success: @Model.ReadFromRI.success.ToString()</h4>
+    <h4>Server: @Model.ReadFromRI.serverName</h4>
+    @if (!Model.ReadFromRI.success)
+    {
+        <h4>Error: @Model.ReadFromRI.errorMessage</h4>
+    }
+</div>
+
+<div>
+    <h3 class="display-4">Cosmos Read</h3>
+    <h4>Success: @Model.ReadCosmos.success.ToString()</h4>
+    <h4>Server: @Model.ReadCosmos.serverName</h4>
+    @if (!Model.ReadCosmos.success)
+    {
+        <h4>Error: @Model.ReadCosmos.errorMessage</h4>
+    }
+</div>
+
+
+<div>
+    <h3 class="display-4">Cosmos Write</h3>
+    <h4>Success: @Model.WriteCosmos.success.ToString()</h4>
+    <h4>Server: @Model.WriteCosmos.serverName</h4>
+    @if (!Model.WriteCosmos.success)
+    {
+        <h4>Error: @Model.WriteCosmos.errorMessage</h4>
+    }
+</div>
