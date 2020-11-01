@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -51,6 +52,9 @@ namespace PrivateLinkDataTest.Pages
                 {
                     conn.AccessToken = accessToken;
                     await conn.OpenAsync();
+                    SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder(conn.ConnectionString);
+                    string fqdn = builder.DataSource.Split(':').Last().Split(',').First();
+                    var entry = Dns.GetHostEntry(fqdn);
 
                     using (SqlCommand cmd = new SqlCommand("SELECT TOP 1  @@SERVERNAME, Id FROM Items", conn))
                     {
@@ -60,7 +64,9 @@ namespace PrivateLinkDataTest.Pages
                             return new Result()
                             {
                                 serverName = reader.GetString(0),
-                                success = true
+                                success = true,
+                                endpointIPAddress = entry.AddressList.First().ToString(),
+                                endpoint = fqdn
                             };
                         }
                     }
@@ -86,6 +92,9 @@ namespace PrivateLinkDataTest.Pages
                 {
                     conn.AccessToken = accessToken;
                     await conn.OpenAsync();
+                    SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder(conn.ConnectionString);
+                    string fqdn = builder.DataSource.Split(':').Last().Split(',').First();
+                    var entry = Dns.GetHostEntry(fqdn);
 
                     using (SqlCommand cmd = new SqlCommand("INSERT INTO NewItems VALUES (Newid());SELECT @@SERVERNAME", conn))
                     {
@@ -93,7 +102,9 @@ namespace PrivateLinkDataTest.Pages
                         return new Result()
                         {
                             serverName = serverName,
-                            success = true
+                            success = true,
+                            endpointIPAddress = entry.AddressList.First().ToString(),
+                            endpoint = fqdn
                         };
                     }
                 }
@@ -118,13 +129,17 @@ namespace PrivateLinkDataTest.Pages
 
                 var db = cosmosClient.GetDatabase("test");
                 var container = db.GetContainer("items");
+                string fqdn = cosmosClient.Endpoint.Host;
+                var entry = Dns.GetHostEntry(fqdn);
 
                 ItemResponse<Doc> readItemResponse = await container.ReadItemAsync<Doc>("5ae9ec8c-897b-4cd3-9529-14f47ff27ff3", new PartitionKey("5ae9ec8c-897b-4cd3-9529-14f47ff27ff3"));
 
                 return new Result()
                 {
                     success = readItemResponse.StatusCode == System.Net.HttpStatusCode.OK,
-                    serverName = "N/A"
+                    serverName = "N/A",
+                    endpointIPAddress = entry.AddressList.First().ToString(),
+                    endpoint = fqdn
                 };
             }
             catch (Exception ex)
@@ -147,6 +162,8 @@ namespace PrivateLinkDataTest.Pages
 
                 var db = cosmosClient.GetDatabase("test");
                 var container = db.GetContainer("items");
+                string fqdn = cosmosClient.Endpoint.Host;
+                var entry = Dns.GetHostEntry(fqdn);
 
                 Doc newDoc = new Doc() { id = Guid.NewGuid().ToString("d") };
 
@@ -155,7 +172,9 @@ namespace PrivateLinkDataTest.Pages
                 return new Result()
                 {
                     success = readItemResponse.StatusCode == System.Net.HttpStatusCode.Created,
-                    serverName = "N/A"
+                    serverName = "N/A",
+                    endpointIPAddress = entry.AddressList.First().ToString(),
+                    endpoint = fqdn
                 };
             }
             catch (Exception ex)
@@ -175,6 +194,8 @@ namespace PrivateLinkDataTest.Pages
         public bool success { get; set; }
         public string errorMessage { get; set; }
         public string serverName { get; set; }
+        public string endpointIPAddress { get; set; }
+        public string endpoint { get; set; }
     }
 
     public class Doc
